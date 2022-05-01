@@ -1,3 +1,50 @@
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# Create your models here.
+from datetime import datetime
+
+
+class User(AbstractUser):
+    def get_list_of_items(self):
+        items = Item.objects.filter(user__id=self.id).all()
+        return [item for item in items]
+
+
+class Item(models.Model):
+    STATUS_CHOICES = (
+        ('open', 'open'),
+        ('in progress', 'in progress'),
+        ('done', 'done'),
+        ('to do', 'to do'),
+        ('in review', 'in review'),
+        ('cancelled', 'cancelled'),
+        ('blocked', 'blocked'),
+    )
+    CATEGORY_CHOICES = (
+        ('bug', 'bug'),
+        ('epic', 'epic'),
+        ('improvement', 'improvement'),
+        ('new feature', 'new feature'),
+        ('story', 'story'),
+        ('task', 'task'),
+    )
+
+    title = models.CharField(max_length=200)
+    text = models.TextField()
+    status = models.CharField(
+        max_length=11,
+        choices=STATUS_CHOICES,
+        default='open'
+    )
+    category = models.CharField(
+        max_length=11,
+        choices=CATEGORY_CHOICES,
+        default='development'
+    )
+    due_date = models.DateTimeField(blank=True)
+    created_at = models.DateTimeField(default=datetime.now, blank=True)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='items')
+
+    def __str__(self):
+        return self.title

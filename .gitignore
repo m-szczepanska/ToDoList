@@ -3,7 +3,7 @@
 # SQLite
 *.sqlite3
 
-# Python shieet
+# Python complied files
 *.pyc
 *__pycache__
 
