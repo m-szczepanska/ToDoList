@@ -1,0 +1,14 @@
+# Git env
+*.git/
+# SQLite
+*.sqlite3
+
+# Python shieet
+*.pyc
+*__pycache__
+
+# Notes, prototypes, development crap, backups
+/__notes
+
+# Mac OS
+*.DS_Store
