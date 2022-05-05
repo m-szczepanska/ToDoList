@@ -1,6 +1,4 @@
 from django.shortcuts import render
-
-
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -9,7 +7,7 @@ from todoapp.models import (
     User, Item
 )
 from todoapp.serializers import (
-    GetUserSerializer, CreateUserSerializer,
+    GetUserSerializer, CreateUserSerializer, UpdateUserSerializer,
     ItemSerializer)
 
 from todoapp.services import (
@@ -38,8 +36,8 @@ def user_list(request):
             last_name=data['last_name'],
             email=data['email']
         )
-        new_user.set_password(data['password'])  # also saves the instance
-
+        new_user.set_password(data['password'])
+        new_user.save()
         serializer_return = GetUserSerializer(new_user)
         return JsonResponse(serializer_return.data, safe=False, status=201)
 
@@ -51,7 +49,7 @@ def user_details(request, id):
     """
     try:
         user = User.objects.get(id=id)
-    except User.DoesNotExists:
+    except User.DoesNotExist:
         return HttpResponse(status=404)
 
     if request.method == 'GET':
@@ -60,7 +58,6 @@ def user_details(request, id):
 
     elif request.method == 'PUT':
         # No changing passwords here!
-        data = request.json()
         data = JSONParser().parse(request)
         serializer = UpdateUserSerializer(user, data=data)
         if not serializer.is_valid():
@@ -85,6 +82,7 @@ def item_list(request):
         serializer = ItemSerializer(items, many=True)
         return JsonResponse(serializer.data, safe=False)
 
+
 @csrf_exempt
 def item_create(request, user_id):
     try:
@@ -104,11 +102,41 @@ def item_create(request, user_id):
             status=data['status'],
             category=data['category'],
             due_date=data['due_date'],
-            user=user
+            owner=user,
+            creator=user
         )
-
         serializer_return = ItemSerializer(new_item)
         return JsonResponse(serializer_return.data, safe=False, status=201)
+
+
+@csrf_exempt
+def item_update(request, id, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return HttpResponse(status=404)
+
+    try:
+        item = Item.objects.get(id=id)
+    except Item.DoesNotExist:
+        return HttpResponse(status=404)
+
+    if request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = ItemSerializer(item, data=data)
+        if not serializer.is_valid():
+            return JsonResponse(serializer.errors, status=400)
+
+        item.title = data['title']
+        item.text = data['text']
+        item.status = data['status']
+        item.category = data['category']
+        item.due_date = data['due_date']
+        item.owner = user
+        item.save()
+
+        serializer_return = ItemSerializer(item)
+        return JsonResponse(serializer_return.data, safe=False)
 
 
 @csrf_exempt
@@ -126,3 +154,7 @@ def item_details(request, id):
     elif request.method == "DELETE":
         item.delete()
         return HttpResponse(status=204)
+
+
+def index(request):
+	return render(request, 'todoapp/index.html')

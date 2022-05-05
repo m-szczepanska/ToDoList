@@ -5,9 +5,7 @@ from datetime import datetime
 
 
 class User(AbstractUser):
-    def get_list_of_items(self):
-        items = Item.objects.filter(user__id=self.id).all()
-        return [item for item in items]
+    ...
 
 
 class Item(models.Model):
@@ -43,8 +41,13 @@ class Item(models.Model):
     )
     due_date = models.DateTimeField(blank=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='items')
+    creator = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='created_items')
+    owner = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='owned_items',
+        default=creator,)
 
     def __str__(self):
         return self.title

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <title>ToDoList</title>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ </head>
+<body>
+    <h1>ToDoList</h1>
+<div id="list_of_tasks">
+    <button id="btn1">User list</button>
+    <button id="btn2">List of Tasks</button>
+    <form action="http://localhost:8000/users/">
+        <input type="submit" value="Go to Google" />
+    </form>
+</div>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $("#btn1").click(function(){
+            var link = document.createElement('a');
+            link.href = "http://localhost:8000/users/";
+            link.target= "blank";
+            document.body.appendChild(link);
+            link.click();
+        });
+        $("#btn2").click(function(){
+            $("body").append('<a id="link" href="../user_list.html" target="blank">&nbsp;</a>');
+            $('#link')[0].click();
+        });
+    });
+    </script>
+    <script>
+    function pageRedirect() {
+      window.location.href = "../user_list.html";
+    }
+</script>
+    <button id="btn3" type="button" onclick="pageRedirect()">Go to Tutorial Republic</button>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <title>ToDoList</title>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.js"></script>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-modal/0.9.1/jquery.modal.min.css" />
+ </head>
+<body>
+    <h1>User list</h1>
+
+<div id="list_of_tasks">
+</div>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $.ajax({
+                url : "http://localhost:8000/users/",
+                dataType: "json",
+                success : function (data) {
+                        console.log(data);
+                        for (var item in data) {
+                            console.log(item)
+                            $("<h2 />", {text: `User: ${data[item]['first_name']} ${data[item]['last_name']}`}).appendTo("#list_of_tasks");
+                            $('#list_of_tasks').append(`<a class="b" href=http://localhost:8000/users/${data[item]["id"]}>costam</a>`);
+                            $("<p />", {text: `username: ${data[item]['username']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `id: ${data[item]['id']}`}).appendTo("#list_of_tasks");
+                            };
+                        }
+                })
+                });
+    </script>
+</body>
+</html>

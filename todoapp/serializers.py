@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from todoapp.models import User, Item
+from todoapp.services import (
+    MinimumLengthValidator, NumericPasswordValidator)
 
 
 class ItemSerializer(serializers.Serializer):
@@ -16,6 +18,8 @@ class ItemSerializer(serializers.Serializer):
         allow_blank=False)
     due_date = serializers.DateTimeField(required=False)
     created_at = serializers.DateTimeField(required=False)
+    creator_id = serializers.IntegerField(required=False)
+    owner_id = serializers.IntegerField(required=False)
 
 
 class GetUserSerializer(serializers.Serializer):
@@ -28,8 +32,7 @@ class GetUserSerializer(serializers.Serializer):
         required=True, allow_blank=False)
     username = serializers.CharField(
         required=True, allow_blank=False, max_length=150)
-    items = ItemSerializer(many=True, read_only=True)
-
+    owned_items = ItemSerializer(many=True, read_only=True)
 
 
 class CreateUserSerializer(serializers.Serializer):
@@ -56,10 +59,14 @@ class CreateUserSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 'Password must contain at least 1 digit')
 
-        user = User.objects.filter(email=data['email']).first()
-        if player:
+        user_mail = User.objects.filter(email=data['email']).first()
+        user_name = User.objects.filter(username=data['username']).first()
+        if user_mail:
             raise serializers.ValidationError(
-                'USer with this email already exists.')
+                'User with this email already exists.')
+        elif user_name:
+            raise serializers.ValidationError(
+                'User with this username already exists.')
         return data
 
 
@@ -70,13 +77,10 @@ class UpdateUserSerializer(serializers.Serializer):
         required=True, allow_blank=False, max_length=150)
     email = serializers.EmailField(
         required=True, allow_blank=False)
-    is_superuser = serializers.BooleanField(default=False)
-    is_staff = serializers.BooleanField(default=False)
-    is_active = serializers.BooleanField(default=False)
 
     def validate(self, data):
-        player = Player.objects.filter(email=data['email']).first()
-        if player and player.id != self.instance.id:
+        user = User.objects.filter(email=data['email']).first()
+        if user and user.id != self.instance.id:
             raise serializers.ValidationError(
-                'Player with this email already exists.')
+                'User with this email already exists.')
         return data

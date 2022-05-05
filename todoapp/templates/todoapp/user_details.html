@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+ <head>
+   <title>TodoList</title>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+ </head>
+<body>
+    <h1>User details</h1>
+<div id="jsonresp" style="margin-top: 100px">
+   <p><label> First name :</label> <span id="first_name"></span></p>
+   <p><label> Last name :</label> <span id="last_name"></span></p>
+   <p><label> age :</label> <span id="username"></span></p>
+   <p><label> gender : </label> <span id="email"></span></p>
+</div>
+<div id="list_of_tasks">
+</div>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        $.ajax({
+                url : "http://localhost:8000/users/1",
+                dataType: "json",
+                success : function (data) {
+                        console.log(data);
+                        $('#username').text(data['username']);
+                        $('#last_name').text(data['last_name']);
+                        $('#first_name').text(data['first_name']);
+                        $('#email').text(data['email']);
+                        console.log(data['owned_items'])
+                        for (var item in data['owned_items']) {
+                            $("<h2 />", {text: `Item id: ${data['owned_items'][item]['id']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `title: ${data['owned_items'][item]['title']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `text: ${data['owned_items'][item]['text']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `status: ${data['owned_items'][item]['status']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `category: ${data['owned_items'][item]['category']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `due date: ${data['owned_items'][item]['due_date']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `created_at: ${data['owned_items'][item]['created_at']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `creator_id: ${data['owned_items'][item]['creator_id']}`}).appendTo("#list_of_tasks");
+                            $("<p />", {text: `owner_id: ${data['owned_items'][item]['owner_id']}`}).appendTo("#list_of_tasks");
+                            };
+                        }
+                })
+                });
+    </script>
+</body>
+</html>
